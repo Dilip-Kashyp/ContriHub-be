@@ -24,7 +24,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: true
+          push: true 
           tags: |
             dilipkumar2/go-api:latest
             dilipkumar2/go-api:${{ github.sha }}
