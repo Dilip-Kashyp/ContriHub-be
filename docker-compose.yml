@@ -4,7 +4,7 @@ services:
     build: .
     container_name: contrihub-be
     ports:
-      - "8080:8080"
+      - "5050:5050"
     env_file:
       - .env
     environment:
@@ -14,6 +14,7 @@ services:
       - DB_NAME=openscout
       - DB_PORT=5432
       - FRONTEND_URL=https://contri-hub.vercel.app/
+      # - FRONTEND_URL=http://localhost:3000
     depends_on:
       - db
     restart: unless-stopped
