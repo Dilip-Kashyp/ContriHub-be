@@ -16,8 +16,8 @@ func main() {
 
 	r := router.SetupRouter()
 
-	log.Println("Server starting on port 8080...")
-	if err := r.Run(":8080"); err != nil {
+	log.Println("Server starting on port 5050...")
+	if err := r.Run(":5050"); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 }
