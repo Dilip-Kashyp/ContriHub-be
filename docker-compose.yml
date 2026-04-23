@@ -1,6 +1,8 @@
 services:
   backend:
+    # image: dilipkumar2/contrihub-be:latest
     build: .
+    container_name: contrihub-be
     ports:
       - "8080:8080"
     env_file:
@@ -11,7 +13,7 @@ services:
       - DB_PASSWORD=postgres
       - DB_NAME=openscout
       - DB_PORT=5432
-      - FRONTEND_URL=http://localhost:3000
+      - FRONTEND_URL=https://contri-hub.vercel.app/
     depends_on:
       - db
     restart: unless-stopped
@@ -22,8 +24,8 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: openscout
-    ports:
-      - "5432:5432"
+    # ports:
+    #   - "5432:5432"
     volumes:
       - openscout_pgdata:/var/lib/postgresql/data
     restart: unless-stopped
