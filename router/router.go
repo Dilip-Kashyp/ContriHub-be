@@ -26,8 +26,8 @@ func SetupRouter() *gin.Engine {
 		// GitHub Proxy
 		api.Any(constants.GithubProxy, handlers.ProxyHandler)
 
-		// AI routes (rate-limited: 10 requests per 60 seconds per token)
-		aiLimiter := middleware.NewRateLimiter(10, 60)
+		// AI routes (rate-limited: 60 requests per 1 second per token)
+		aiLimiter := middleware.NewRateLimiter(60, 1)
 		aiGroup := api.Group("", aiLimiter.Middleware())
 		{
 			aiGroup.POST(constants.AIExplainRepo, handlers.ExplainRepoHandler)
