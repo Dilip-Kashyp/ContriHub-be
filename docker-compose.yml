@@ -14,9 +14,10 @@ services:
       - DB_NAME=openscout
       - DB_PORT=5432
       - FRONTEND_URL=https://contri-hub.vercel.app/
-      # - FRONTEND_URL=http://localhost:3000
+      - REDIS_URL=redis:6379
     depends_on:
       - db
+      - redis
     restart: unless-stopped
   
   db:
@@ -29,6 +30,12 @@ services:
     #   - "5432:5432"
     volumes:
       - openscout_pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    # ports:
+    #   - "6379:6379"
     restart: unless-stopped
 
 volumes:
