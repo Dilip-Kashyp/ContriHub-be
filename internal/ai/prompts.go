@@ -21,7 +21,7 @@ Provide your response with these sections:
 1. **What it does** — A clear 2-3 sentence explanation
 2. **Tech Stack** — Languages, frameworks, and tools used
 3. **Who it's for** — Target audience
-4. **How to run** — Quick-start steps (if available from README)`, repoName, description, language, topics, truncateText(readmeSnippet, 3000))
+4. **How to run** — Quick-start steps (if available from README)`, repoName, description, language, topics, truncateText(readmeSnippet, 1500))
 
 	if userQuestion != "" {
 		prompt += fmt.Sprintf("\n5. **Your Question** — Answer this: %s", userQuestion)
@@ -32,12 +32,17 @@ Provide your response with these sections:
 
 // BuildFindProjectsPrompt creates a prompt to explain why projects match a query.
 func BuildFindProjectsPrompt(query string, repoSummaries string) string {
-	return fmt.Sprintf(`A developer is looking for: "%s"
+	return fmt.Sprintf(`You are Gibo, an expert open-source mentor. A developer is looking for: "%s"
 
-Here are the top matching repositories found:
+I have found these top repositories on GitHub for them:
 %s
 
-For each repository, write 1-2 sentences explaining WHY it matches the developer's request and what they can learn from it. Be specific and helpful. Format as a numbered list matching the repos above.`, query, repoSummaries)
+Analyze these projects and provide a helpful response:
+1. **The Top Pick** — Identify the single best repository from this list that matches their intent. Explain exactly why it's the winner and what specific skills they can gain by contributing there.
+2. **Alternative Options** — Briefly mention 2-3 other repositories from the list, explaining how they differ (e.g., "more complex architecture", "better for UI/UX", "pure backend").
+3. **Getting Started Tip** — Provide one actionable piece of advice for a developer starting with their first contribution to these types of projects.
+
+Keep the tone encouraging, technical but accessible, and highly relevant to their specific query. Output in clean markdown.`, query, truncateText(repoSummaries, 2000))
 }
 
 // BuildRoadmapPrompt creates a prompt for generating a learning roadmap.
@@ -56,7 +61,7 @@ Generate an ordered learning path with:
 3. **What to learn** from each repo (specific skills/concepts)
 4. **Estimated time** to spend on each step
 
-Order from easiest to hardest. Keep it practical and actionable.`, skillLevel, interest, repoSummaries)
+Order from easiest to hardest. Keep it practical and actionable.`, skillLevel, interest, truncateText(repoSummaries, 2500))
 }
 
 // BuildStartGuidePrompt creates a prompt for navigating a repository.
@@ -77,7 +82,7 @@ Provide a clear guide with:
 1. **Entry Point** — The main file(s) to look at first
 2. **Important Folders** — What each key directory contains
 3. **Steps to Run** — How to set up and run the project locally
-4. **Suggested Learning Order** — Which files/folders to read in what order to understand the codebase`, repoName, description, language, truncateText(readmeSnippet, 3000), truncateText(fileStructure, 1000))
+4. **Suggested Learning Order** — Which files/folders to read in what order to understand the codebase`, repoName, description, language, truncateText(readmeSnippet, 1500), truncateText(fileStructure, 800))
 }
 
 // BuildReadmePrompt creates a prompt for generating a GitHub profile README.
@@ -101,7 +106,7 @@ Create a polished README with these sections:
 4. **Featured Projects** — Highlight top repos with links and descriptions
 5. **Contact** — GitHub profile link
 
-Use emojis tastefully. Make it visually appealing with proper markdown formatting. Output ONLY the raw markdown, no explanations.`, username, name, bio, topRepos, languages)
+Use emojis tastefully. Make it visually appealing with proper markdown formatting. Output ONLY the raw markdown, no explanations.`, username, name, bio, truncateText(topRepos, 1500), languages)
 }
 
 // BuildSummaryPrompt creates a prompt for generating a professional summary.
@@ -109,7 +114,7 @@ func BuildSummaryPrompt(skills, projects, experience string) string {
 	prompt := fmt.Sprintf(`Write a concise professional summary (4-6 lines) for a software developer's resume.
 
 **Skills:** %s
-**Projects:** %s`, skills, projects)
+**Projects:** %s`, skills, truncateText(projects, 1000))
 
 	if experience != "" {
 		prompt += fmt.Sprintf("\n**Experience:** %s", experience)

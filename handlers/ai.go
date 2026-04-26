@@ -6,12 +6,42 @@ import (
 	"net/http"
 	"strings"
 
+	"contrihub/constants"
 	"contrihub/database"
 	"contrihub/internal/ai"
 	"contrihub/models"
 
 	"github.com/gin-gonic/gin"
 )
+
+// handleAIError maps complex AI errors to standardized codes and messages.
+func handleAIError(c *gin.Context, err error) {
+	errStr := err.Error()
+
+	code := constants.ErrCodeServer
+	msg := constants.ErrMsgServer
+	status := http.StatusInternalServerError
+
+	if strings.Contains(errStr, "401") || strings.Contains(errStr, "unauthorized") {
+		code = constants.ErrCodeUnauthorized
+		msg = constants.ErrMsgUnauthorized
+		status = http.StatusUnauthorized
+	} else if strings.Contains(errStr, "404") || strings.Contains(errStr, "not_found") {
+		code = constants.ErrCodeNotFound
+		msg = constants.ErrMsgNotFound
+		status = http.StatusNotFound
+	} else if strings.Contains(errStr, "413") || strings.Contains(errStr, "rate_limit_exceeded") || strings.Contains(errStr, "tokens") {
+		code = constants.ErrCodeRateLimit
+		msg = constants.ErrMsgRateLimit
+		status = http.StatusRequestEntityTooLarge
+	}
+
+	c.JSON(status, gin.H{
+		"error":           msg,
+		"code":            code,
+		"is_notification": true,
+	})
+}
 
 // ─── Request/Response Types ──────────────────────────────────────────────────
 
@@ -103,7 +133,7 @@ func ExplainRepoHandler(c *gin.Context) {
 	prompt := ai.BuildExplainRepoPrompt(req.RepoName, req.Description, req.Language, req.Topics, req.Readme, req.Question)
 	response, err := ai.CallLLM(prompt, 1024)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("AI service error: %v", err)})
+		handleAIError(c, err)
 		return
 	}
 
@@ -138,7 +168,7 @@ func FindProjectsHandler(c *gin.Context) {
 	prompt := ai.BuildFindProjectsPrompt(req.Query, req.RepoResults)
 	response, err := ai.CallLLM(prompt, 1024)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("AI service error: %v", err)})
+		handleAIError(c, err)
 		return
 	}
 
@@ -173,7 +203,7 @@ func RoadmapHandler(c *gin.Context) {
 	prompt := ai.BuildRoadmapPrompt(req.Interest, req.SkillLevel, req.Repos)
 	response, err := ai.CallLLM(prompt, 2048)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("AI service error: %v", err)})
+		handleAIError(c, err)
 		return
 	}
 
@@ -208,7 +238,7 @@ func StartGuideHandler(c *gin.Context) {
 	prompt := ai.BuildStartGuidePrompt(req.RepoName, req.Description, req.Language, req.Readme, req.FileStructure)
 	response, err := ai.CallLLM(prompt, 1536)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("AI service error: %v", err)})
+		handleAIError(c, err)
 		return
 	}
 
@@ -244,7 +274,7 @@ func GenerateReadmeHandler(c *gin.Context) {
 	prompt := ai.BuildReadmePrompt(req.Username, req.Name, req.Bio, req.TopRepos, req.Languages)
 	response, err := ai.CallLLM(prompt, 2048)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("AI service error: %v", err)})
+		handleAIError(c, err)
 		return
 	}
 
@@ -282,7 +312,7 @@ func GenerateSummaryHandler(c *gin.Context) {
 	prompt := ai.BuildSummaryPrompt(req.Skills, req.Projects, req.Experience)
 	response, err := ai.CallLLM(prompt, 512)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("AI service error: %v", err)})
+		handleAIError(c, err)
 		return
 	}
 
@@ -376,7 +406,7 @@ func SubmitChatMessageHandler(c *gin.Context) {
 	// Call LLM
 	response, err := ai.CallLLM(promptBuilder.String(), 1536)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("AI service error: %v", err)})
+		handleAIError(c, err)
 		return
 	}
 
