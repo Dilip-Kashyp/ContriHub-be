@@ -32,10 +32,7 @@ func SetupRouter() *gin.Engine {
 		{
 			aiGroup.POST(constants.AIExplainRepo, handlers.ExplainRepoHandler)
 			aiGroup.POST(constants.AIFindProjects, handlers.FindProjectsHandler)
-			aiGroup.POST(constants.AIRoadmap, handlers.RoadmapHandler)
 			aiGroup.POST(constants.AIStartGuide, handlers.StartGuideHandler)
-			aiGroup.POST(constants.AIGenerateReadme, handlers.GenerateReadmeHandler)
-			aiGroup.POST(constants.AIGenerateSummary, handlers.GenerateSummaryHandler)
 			aiGroup.GET(constants.AIChatHistory, handlers.GetChatHistoryHandler)
 			aiGroup.POST(constants.AIChatMessage, handlers.SubmitChatMessageHandler)
 		}

@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 
 	"contrihub/constants"
@@ -392,6 +393,14 @@ func SubmitChatMessageHandler(c *gin.Context) {
 	var promptBuilder strings.Builder
 	promptBuilder.WriteString("You are a helpful assistant for OpenSource developers on ContriHub.\n")
 	promptBuilder.WriteString("You help developers find projects, understand codebases, and guide them.\n")
+	
+	// Inject CONTRIBUTING.md if available
+	content, err := os.ReadFile("../CONTRIBUTING.md")
+	if err == nil {
+		promptBuilder.WriteString("When guiding users on contribution steps, strictly follow these contribution guidelines:\n")
+		promptBuilder.WriteString(string(content) + "\n\n")
+	}
+
 	promptBuilder.WriteString("Here is the recent conversation history:\n\n")
 
 	for _, msg := range history {
